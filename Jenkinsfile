@@ -13,18 +13,22 @@ pipeline {
                 git 'https://github.com/akashbhamri/node-docker-k8s-sonarqube.git'
             }
         }
-        stage('Check Java Installation') {
+        
+        stage('Build and Test') {
             steps {
-                sh 'java -version'  // Check Java installation
+                script {
+                    // Install dependencies
+                    sh 'npm install'
+                    
+                    // Run tests to generate coverage report
+                    sh 'npm test'
+                }
             }
         }
+
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Run tests to generate coverage report
-                    sh 'npm install' // Ensure dependencies are installed
-                    sh 'npm test'    // Run tests and generate coverage
-
                     // Run SonarQube analysis
                     withSonarQubeEnv('SonarQube') {
                         sh 'npm run sonar'
@@ -32,6 +36,7 @@ pipeline {
                 }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -39,6 +44,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
@@ -49,11 +55,12 @@ pipeline {
                 }
             }
         }
+
         stage('Update Manifests and Push to Git') {
             steps {
                 script {
                     // Update the Docker image in the manifest file
-                     sh """
+                    sh """
                     sed -i "" 's|image: .*|image: ${DOCKER_IMAGE}|' manifest/Deployment.yml
                     """
 
@@ -69,11 +76,6 @@ pipeline {
                     }
                 }
             }
-        }
-    }
-    post {
-        always {
-            cleanWs()
         }
     }
 }
