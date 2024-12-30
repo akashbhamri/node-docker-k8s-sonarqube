@@ -1,0 +1,6 @@
+projectKey=node-docker-k8s-sonarqube
+serverUrl=http://localhost:9000
+serverVersion=24.12.0.100206
+dashboardUrl=http://localhost:9000/dashboard?id=node-docker-k8s-sonarqube
+ceTaskId=9d0303e0-5823-461b-b052-8f140b2ff6d5
+ceTaskUrl=http://localhost:9000/api/ce/task?id=9d0303e0-5823-461b-b052-8f140b2ff6d5
