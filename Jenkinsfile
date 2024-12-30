@@ -63,14 +63,19 @@ pipeline {
                     sh """
                     sed -i "" 's|image: .*|image: ${DOCKER_IMAGE}|' manifest/Deployment.yml
                     """
-
-                    // Push updated manifests to Git
+                    
+                    // Stage all changes (including untracked files)
+                    sh 'git add -A'
+                    
+                    // Commit and push updated manifests to Git if there are changes
+                    sh """
+                    git diff-index --quiet HEAD || git commit -m "Update Docker image to $DOCKER_IMAGE"
+                    """
+                    
                     withCredentials([usernamePassword(credentialsId: 'git-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh """
                         git config user.name "Jenkins"
                         git config user.email "jenkins@example.com"
-                        git add manifest/
-                        git commit -m "Update Docker image to $DOCKER_IMAGE"
                         git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/akashbhamri/node-docker-k8s-sonarqube.git
                         """
                     }
